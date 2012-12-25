@@ -33,7 +33,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
       }
       return result;
     };
-    applyAnimations = function(node, animations) {
+    applyAnimations = function(node, animations, viewModel) {
       var key, value, _fn;
       _fn = function(key, value) {
         var fn, trans;
@@ -41,7 +41,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
         if (typeof node[key] === 'function') {
           fn = function(value) {
             try {
-              return node[key](value);
+              return node[key].call(viewModel, value);
             } catch (error) {
 
             }
@@ -68,11 +68,11 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
         _fn(key, value);
       }
     };
-    applyEvents = function(node, element, events) {
+    applyEvents = function(node, element, events, viewModel) {
       var key, value, _fn;
       _fn = function(key, value) {
         return node.on(key, function(evt) {
-          return value(element, evt);
+          return value.call(viewModel, element, evt);
         });
       };
       for (key in events) {
@@ -146,8 +146,9 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
             element.style.display = 'none';
           }
           element._kk = node;
-          applyAnimations(node, allBindingsAccessor()['animate']);
-          applyEvents(node, element, allBindingsAccessor()['events']);
+		  element.viewModel = viewModel;
+          applyAnimations(node, allBindingsAccessor()['animate'], viewModel);
+          applyEvents(node, element, allBindingsAccessor()['events'], viewModel);
           return {
             controlsDescendantBindings: true
           };
